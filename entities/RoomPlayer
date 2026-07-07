@@ -1,0 +1,37 @@
+{
+  "name": "RoomPlayer",
+  "type": "object",
+  "properties": {
+    "room_code": {
+      "type": "string",
+      "description": "Code of the room this player is in"
+    },
+    "name": {
+      "type": "string",
+      "description": "Player display name"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Guest session ID"
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    },
+    "is_host": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "room_code",
+    "name",
+    "session_id"
+  ],
+  "rls": {
+    "create": true,
+    "read": true,
+    "update": true,
+    "delete": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Paranoia - The Ultimate Party Game",
+  "short_name": "Paranoia",
+  "description": "The ultimate party game — ask spicy questions about your friends and reveal the truth!",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "icons": [
+    {
+      "src": "https://media.db.com/images/public/6a341de8d66eb87f1f65b88e/ee64a9e36_generated_image.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://media.db.com/images/public/6a341de8d66eb87f1f65b88e/ee64a9e36_generated_image.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

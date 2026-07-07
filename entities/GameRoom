@@ -1,0 +1,93 @@
+{
+  "name": "GameRoom",
+  "type": "object",
+  "properties": {
+    "room_code": {
+      "type": "string",
+      "description": "Unique 4-character room code"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "lobby",
+        "playing",
+        "ended"
+      ],
+      "default": "lobby"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "question",
+        "result"
+      ],
+      "default": "question"
+    },
+    "host_session_id": {
+      "type": "string",
+      "description": "Session ID of the host"
+    },
+    "host_name": {
+      "type": "string",
+      "description": "Display name of the host"
+    },
+    "categories": {
+      "type": "object",
+      "description": "Selected question categories"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Shuffled questions for the game"
+    },
+    "players": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Shuffled player list with session IDs"
+    },
+    "round": {
+      "type": "number",
+      "default": 0
+    },
+    "asker_idx": {
+      "type": "number",
+      "default": 0
+    },
+    "current_question": {
+      "type": "string",
+      "default": ""
+    },
+    "coin_result": {
+      "type": "string",
+      "enum": [
+        "",
+        "heads",
+        "tails"
+      ],
+      "default": ""
+    }
+  },
+  "required": [
+    "room_code",
+    "host_session_id",
+    "host_name"
+  ],
+  "rls": {
+    "create": true,
+    "read": true,
+    "update": true,
+    "delete": true
+  }
+}

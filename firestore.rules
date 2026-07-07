@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net (Default-Deny Catch-All)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Primitives
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // --- GAME ROOMS ---
+    match /game_rooms/{roomCode} {
+      allow read: if isValidId(roomCode);
+      
+      allow create: if isValidId(roomCode)
+        && roomCode == incoming().room_code
+        && incoming().keys().hasAll([
+          'room_code', 'status', 'phase', 'host_session_id', 'host_name', 
+          'categories', 'questions', 'players', 'round', 'asker_idx', 
+          'current_question', 'coin_result'
+        ])
+        && incoming().keys().size() == 12
+        && isValidGameRoom(incoming())
+        && incoming().status == 'lobby'
+        && incoming().phase == 'question'
+        && incoming().round == 0
+        && incoming().asker_idx == 0
+        && incoming().current_question == ''
+        && incoming().coin_result == '';
+
+      allow update: if isValidId(roomCode)
+        && isValidGameRoom(incoming())
+        && incoming().room_code == existing().room_code
+        && incoming().host_session_id == existing().host_session_id
+        && (existing().status != 'ended' || incoming().status == 'ended');
+
+      allow delete: if false; // Game rooms cannot be deleted by clients
+    }
+
+    // Game Room Validation Helper
+    function isValidGameRoom(data) {
+      return data.room_code is string && data.room_code.size() == 4
+        && data.status is string && (data.status == 'lobby' || data.status == 'playing' || data.status == 'ended')
+        && data.phase is string && (data.phase == 'question' || data.phase == 'result')
+        && data.host_session_id is string && data.host_session_id.size() > 0 && data.host_session_id.size() <= 64
+        && data.host_name is string && data.host_name.size() > 0 && data.host_name.size() <= 32
+        && data.categories is map
+        && data.questions is list
+        && data.players is list
+        && data.round is number && data.round >= 0
+        && data.asker_idx is number && data.asker_idx >= 0
+        && data.current_question is string && data.current_question.size() <= 1000
+        && data.coin_result is string && (data.coin_result == '' || data.coin_result == 'heads' || data.coin_result == 'tails');
+    }
+
+    // --- ROOM PLAYERS ---
+    match /room_players/{playerId} {
+      allow read: if isValidId(playerId);
+      allow list: if true; // Allowed to query/list room players in the lobby
+      
+      allow create: if isValidId(playerId)
+        && incoming().keys().hasAll(['room_code', 'name', 'session_id', 'order', 'is_host'])
+        && incoming().keys().size() == 5
+        && isValidRoomPlayer(incoming())
+        // Global Consistency Invariant: verify game room exists to prevent orphaned records
+        && exists(/databases/$(database)/documents/game_rooms/$(incoming().room_code));
+
+      allow update: if isValidId(playerId)
+        && isValidRoomPlayer(incoming())
+        && incoming().room_code == existing().room_code
+        && incoming().session_id == existing().session_id;
+
+      allow delete: if isValidId(playerId);
+    }
+
+    // Room Player Validation Helper
+    function isValidRoomPlayer(data) {
+      return data.room_code is string && data.room_code.size() == 4
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 32
+        && data.session_id is string && data.session_id.size() > 0 && data.session_id.size() <= 64
+        && data.order is number && data.order >= 0
+        && data.is_host is bool;
+    }
+  }
+}

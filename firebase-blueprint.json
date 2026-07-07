@@ -1,0 +1,84 @@
+{
+  "entities": {
+    "GameRoom": {
+      "title": "GameRoom",
+      "description": "Represents an online game room",
+      "type": "object",
+      "properties": {
+        "room_code": {
+          "type": "string",
+          "description": "Unique 4-character room code"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["lobby", "playing", "ended"]
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["question", "result"]
+        },
+        "host_session_id": {
+          "type": "string"
+        },
+        "host_name": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "object"
+        },
+        "questions": {
+          "type": "array"
+        },
+        "players": {
+          "type": "array"
+        },
+        "round": {
+          "type": "number"
+        },
+        "asker_idx": {
+          "type": "number"
+        },
+        "current_question": {
+          "type": "string"
+        },
+        "coin_result": {
+          "type": "string"
+        }
+      },
+      "required": ["room_code", "status", "phase", "host_session_id", "host_name"]
+    },
+    "RoomPlayer": {
+      "title": "RoomPlayer",
+      "description": "Represents a player in a game room",
+      "type": "object",
+      "properties": {
+        "room_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "order": {
+          "type": "number"
+        },
+        "is_host": {
+          "type": "boolean"
+        }
+      },
+      "required": ["room_code", "name", "session_id"]
+    }
+  },
+  "firestore": {
+    "/game_rooms/{roomCode}": {
+      "schema": "GameRoom",
+      "description": "Collection of game rooms"
+    },
+    "/room_players/{playerId}": {
+      "schema": "RoomPlayer",
+      "description": "Collection of players in rooms"
+    }
+  }
+}
