@@ -59,8 +59,8 @@ service cloud.firestore {
         && data.categories is map
         && data.questions is list
         && data.players is list
-        && data.round is int && data.round >= 0
-        && data.asker_idx is int && data.asker_idx >= 0
+        && data.round is number && data.round >= 0
+        && data.asker_idx is number && data.asker_idx >= 0
         && data.current_question is string && data.current_question.size() <= 1000
         && data.coin_result is string && (data.coin_result == '' || data.coin_result == 'heads' || data.coin_result == 'tails');
     }
@@ -90,7 +90,7 @@ service cloud.firestore {
       return data.room_code is string && data.room_code.size() == 4
         && data.name is string && data.name.size() > 0 && data.name.size() <= 32
         && data.session_id is string && data.session_id.size() > 0 && data.session_id.size() <= 64
-        && data.order is int && data.order >= 0
+        && data.order is number && data.order >= 0
         && data.is_host is bool;
     }
   }
