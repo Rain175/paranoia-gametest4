@@ -16,6 +16,10 @@ service cloud.firestore {
       return request.resource.data;
     }
 
+    function existing() {
+      return resource.data;
+    }
+
     // --- GAME ROOMS ---
     match /game_rooms/{roomCode} {
       allow read: if isValidId(roomCode);
