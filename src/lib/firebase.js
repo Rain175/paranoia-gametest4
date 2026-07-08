@@ -1,17 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { initializeFirestore, enableMultiTabIndexedDbPersistence } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import firebaseConfig from "../../firebase-applet-config.json";
 
 const app = initializeApp(firebaseConfig);
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-});
-
-// Enable offline multi-tab persistence to make reloads instantaneous and cache query results
-enableMultiTabIndexedDbPersistence(db).catch((err) => {
-  console.warn("Firestore multi-tab persistence failed to enable:", err.message);
-});
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
 export const auth = getAuth(app);
 
