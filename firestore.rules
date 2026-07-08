@@ -29,16 +29,17 @@ service cloud.firestore {
         && incoming().keys().hasAll([
           'room_code', 'status', 'phase', 'host_session_id', 'host_name', 
           'categories', 'questions', 'players', 'round', 'asker_idx', 
-          'current_question', 'coin_result'
+          'current_question', 'coin_result', 'max_rounds'
         ])
-        && incoming().keys().size() == 12
+        && incoming().keys().size() == 13
         && isValidGameRoom(incoming())
         && incoming().status == 'lobby'
         && incoming().phase == 'question'
         && incoming().round == 0
         && incoming().asker_idx == 0
         && incoming().current_question == ''
-        && incoming().coin_result == '';
+        && incoming().coin_result == ''
+        && incoming().max_rounds == 10;
 
       allow update: if isValidId(roomCode)
         && isValidGameRoom(incoming())
@@ -62,7 +63,8 @@ service cloud.firestore {
         && data.round is number && data.round >= 0
         && data.asker_idx is number && data.asker_idx >= 0
         && data.current_question is string && data.current_question.size() <= 1000
-        && data.coin_result is string && (data.coin_result == '' || data.coin_result == 'heads' || data.coin_result == 'tails');
+        && data.coin_result is string && (data.coin_result == '' || data.coin_result == 'heads' || data.coin_result == 'tails')
+        && data.max_rounds is number && data.max_rounds >= 1;
     }
 
     // --- ROOM PLAYERS ---

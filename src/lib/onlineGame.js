@@ -35,6 +35,7 @@ export async function createRoom(hostName, categories) {
       asker_idx: 0,
       current_question: "",
       coin_result: "",
+      max_rounds: 10,
     });
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, `game_rooms/${code}`);
@@ -155,7 +156,8 @@ export async function nextRound(roomCode, room) {
   const nextRoundNum = room.round + 1;
   const playerCount = room.players?.length || 1;
 
-  if (nextRoundNum >= (room.questions?.length || 0)) {
+  const limit = Math.min(room.max_rounds || 10, room.questions?.length || 0);
+  if (nextRoundNum >= limit) {
     try {
       await updateDoc(doc(db, "game_rooms", roomCode), { status: "ended" });
     } catch (error) {
@@ -173,6 +175,24 @@ export async function nextRound(roomCode, room) {
       current_question: room.questions[nextRoundNum],
       coin_result: "",
     });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, `game_rooms/${roomCode}`);
+  }
+}
+
+export async function updateRoomRounds(roomCode, maxRounds) {
+  try {
+    await updateDoc(doc(db, "game_rooms", roomCode), {
+      max_rounds: maxRounds,
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, `game_rooms/${roomCode}`);
+  }
+}
+
+export async function endGame(roomCode) {
+  try {
+    await updateDoc(doc(db, "game_rooms", roomCode), { status: "ended" });
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `game_rooms/${roomCode}`);
   }

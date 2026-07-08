@@ -46,10 +46,19 @@ export default function PlayerLobby({ room, players, onExit }) {
           </div>
         </div>
 
-        <div className="glass rounded-2xl p-6 text-center border border-zinc-800">
+        <div className="glass rounded-2xl p-6 text-center border border-zinc-800 mb-6">
           <Loader2 size={24} className="text-violet-400 animate-spin mx-auto mb-3" />
           <p className="text-zinc-400 font-semibold">Waiting for host to start...</p>
           <p className="text-zinc-600 text-sm mt-1">Hang tight, the game will begin soon</p>
+        </div>
+
+        <div className="text-center glass-strong rounded-2xl p-4 border border-zinc-900/50">
+          <span className="text-zinc-500 text-xs uppercase tracking-widest font-semibold block mb-1">
+            Game Length
+          </span>
+          <span className="font-heading text-lg font-bold text-violet-400">
+            {room.max_rounds || 10} Rounds
+          </span>
         </div>
       </div>
     </div>

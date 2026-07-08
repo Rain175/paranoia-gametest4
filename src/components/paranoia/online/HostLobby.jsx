@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Copy, Check, Zap, Loader2 } from "lucide-react";
 import { CATEGORY_META } from "@/lib/gameData";
-import { startGame } from "@/lib/onlineGame";
+import { startGame, updateRoomRounds } from "@/lib/onlineGame";
 import GameStyles from "../GameStyles";
 
 export default function HostLobby({ room, players, onExit }) {
@@ -14,6 +14,14 @@ export default function HostLobby({ room, players, onExit }) {
 
   const toggleCategory = (cat) => {
     setCategories({ ...categories, [cat]: !categories[cat] });
+  };
+
+  const handleRoundsChange = async (rounds) => {
+    try {
+      await updateRoomRounds(room.room_code, rounds);
+    } catch (e) {
+      setError("Failed to update rounds setting");
+    }
   };
 
   const copyCode = () => {
@@ -84,6 +92,27 @@ export default function HostLobby({ room, players, onExit }) {
                   </span>
                 )}
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-lg font-bold uppercase tracking-widest text-zinc-400 mb-4 font-heading">
+            Game Rounds
+          </h2>
+          <div className="grid grid-cols-4 gap-2">
+            {[5, 10, 15, 20].map((num) => (
+              <button
+                key={num}
+                onClick={() => handleRoundsChange(num)}
+                className={`py-3 rounded-xl transition-all font-bold font-heading border text-center ${
+                  (room.max_rounds || 10) === num
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-transparent shadow-lg shadow-purple-500/10"
+                    : "glass-strong text-zinc-500 border-zinc-800 hover:text-zinc-300"
+                }`}
+              >
+                {num}
+              </button>
             ))}
           </div>
         </div>

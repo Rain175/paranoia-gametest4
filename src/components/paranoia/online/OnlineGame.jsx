@@ -15,6 +15,7 @@ import OnlineQuestionScreen from "@/components/paranoia/online/OnlineQuestionScr
 import OnlineWaitingScreen from "@/components/paranoia/online/OnlineWaitingScreen";
 import OnlineResultScreen from "@/components/paranoia/online/OnlineResultScreen";
 import OnlineGameEnd from "@/components/paranoia/online/OnlineGameEnd";
+import { endGame } from "@/lib/onlineGame";
 
 export default function OnlineGame({ onExit }) {
   const [roomCode, setRoomCode] = useState(() => localStorage.getItem("paranoia_room_code") || "");
@@ -126,12 +127,14 @@ export default function OnlineGame({ onExit }) {
   const currentAsker = room.players?.[room.asker_idx];
   const isMyTurn = currentAsker?.session_id === sessionId;
 
+  let activeScreen = null;
+
   if (room.phase === "question") {
     if (isMyTurn && currentAsker) {
       const others = (room.players || [])
         .filter((_, i) => i !== room.asker_idx)
         .map((p) => p.name);
-      return (
+      activeScreen = (
         <OnlineQuestionScreen
           question={room.current_question}
           asker={currentAsker.name}
@@ -139,12 +142,11 @@ export default function OnlineGame({ onExit }) {
           roomId={room.id}
         />
       );
+    } else {
+      activeScreen = <OnlineWaitingScreen asker={currentAsker?.name || "?"} phase="question" />;
     }
-    return <OnlineWaitingScreen asker={currentAsker?.name || "?"} phase="question" />;
-  }
-
-  if (room.phase === "result") {
-    return (
+  } else if (room.phase === "result") {
+    activeScreen = (
       <OnlineResultScreen
         coinResult={room.coin_result}
         question={room.current_question}
@@ -156,5 +158,38 @@ export default function OnlineGame({ onExit }) {
     );
   }
 
-  return null;
+  const handleEndGameButton = async () => {
+    if (window.confirm("Are you sure you want to end this game?")) {
+      await endGame(room.id);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0c] flex flex-col relative">
+      {/* Top Header Bar for ongoing game */}
+      <div className="w-full bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900/60 px-4 py-3 flex items-center justify-between z-20">
+        <div className="flex flex-col">
+          <span className="text-zinc-500 text-[10px] uppercase tracking-widest font-bold">
+            Paranoia Online
+          </span>
+          <span className="text-sm font-bold text-violet-400 font-heading">
+            Round {room.round + 1} of {room.max_rounds || 10}
+          </span>
+        </div>
+        
+        {isHost && (
+          <button
+            onClick={handleEndGameButton}
+            className="px-3 py-1.5 rounded-lg bg-red-950/30 text-red-400 hover:bg-red-900/40 border border-red-900/40 text-xs font-semibold uppercase tracking-wider transition-all active:scale-95"
+          >
+            End Game
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 relative">
+        {activeScreen}
+      </div>
+    </div>
+  );
 }
