@@ -9,8 +9,23 @@ import ModeSelect from "@/components/paranoia/online/ModeSelect";
 import OnlineGame from "@/components/paranoia/online/OnlineGame";
 
 export default function ParanoiaGame() {
-  const [mode, setMode] = useState(null);
+  const [mode, setMode] = useState(() => {
+    // Default to online if we have an active room code
+    if (localStorage.getItem("paranoia_room_code")) {
+      return "online";
+    }
+    return localStorage.getItem("paranoia_mode") || null;
+  });
   const [screen, setScreen] = useState("setup");
+
+  const handleSetMode = (newMode) => {
+    setMode(newMode);
+    if (newMode) {
+      localStorage.setItem("paranoia_mode", newMode);
+    } else {
+      localStorage.removeItem("paranoia_mode");
+    }
+  };
   const [players, setPlayers] = useState([]);
   const [categories, setCategories] = useState({
     icebreaker: true,
@@ -45,11 +60,11 @@ export default function ParanoiaGame() {
   };
 
   if (!mode) {
-    return <ModeSelect onSelect={setMode} />;
+    return <ModeSelect onSelect={handleSetMode} />;
   }
 
   if (mode === "online") {
-    return <OnlineGame onExit={() => setMode(null)} />;
+    return <OnlineGame onExit={() => handleSetMode(null)} />;
   }
 
   if (screen === "setup") {

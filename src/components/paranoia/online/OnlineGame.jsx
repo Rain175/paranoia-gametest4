@@ -17,10 +17,18 @@ import OnlineResultScreen from "@/components/paranoia/online/OnlineResultScreen"
 import OnlineGameEnd from "@/components/paranoia/online/OnlineGameEnd";
 
 export default function OnlineGame({ onExit }) {
-  const [roomCode, setRoomCode] = useState("");
+  const [roomCode, setRoomCode] = useState(() => localStorage.getItem("paranoia_room_code") || "");
   const [room, setRoom] = useState(null);
   const [players, setPlayers] = useState([]);
   const sessionId = getSessionId();
+
+  useEffect(() => {
+    if (roomCode) {
+      localStorage.setItem("paranoia_room_code", roomCode);
+    } else {
+      localStorage.removeItem("paranoia_room_code");
+    }
+  }, [roomCode]);
 
   useEffect(() => {
     if (!roomCode) {
@@ -75,6 +83,8 @@ export default function OnlineGame({ onExit }) {
   }, [roomCode]);
 
   const handleExit = () => {
+    localStorage.removeItem("paranoia_room_code");
+    localStorage.removeItem("paranoia_mode");
     setRoomCode("");
     setRoom(null);
     setPlayers([]);
